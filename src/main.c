@@ -12,7 +12,7 @@
 static int nprefix = 2;
 static int hash_size = 10000;
 static int maxwords = 50;
-static char *delim = "";
+static char *delim = " ";
 
 static char NOWORD[] = "\n";
 hash_s *states;
