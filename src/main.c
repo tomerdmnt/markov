@@ -12,6 +12,7 @@
 static int nprefix = 2;
 static int hash_size = 10000;
 static int maxwords = 50;
+static char *delim = "";
 
 char NOWORD[] = "\n";
 hash_s *states;
@@ -76,6 +77,11 @@ static void generate(int maxwords) {
     char *prefix[nprefix];
     for (int i = 0; i < nprefix; i++) prefix[i] = NOWORD;
 
+    // prepare output format
+    char fmt[3+strlen(delim)];
+    strcpy(fmt, "%s");
+    strcat(fmt, delim);
+
     for (int i = 0; i < maxwords; i++) {
         int nmatch = 0;
         char *word;
@@ -95,7 +101,7 @@ static void generate(int maxwords) {
             if (random() % ++nmatch == 0) word = n->data;
         }
 
-        printf("%s\n", word);
+        printf(fmt, word);
         // move words in prefix to the right
         memmove(prefix, prefix+1, (nprefix-1)*sizeof(prefix[0]));
         prefix[nprefix-1] = word;
@@ -106,9 +112,10 @@ static void usage() {
     printf("  Usage: markov [options]\n");
     printf("    reads from stdin and writes a markov chain text to stdout\n\n");
     printf("  Options:\n\n");
-    printf("    -s, --hash-size\t\tSets hash table size [10000]\n");
-    printf("    -w, --max-words\t\tSets The maximum words [50]\n");
-    printf("    -p, --prefix-words\t\tSets the prefix [2]\n");
+    printf("    -p, --prefix-words\t\tNumber of words in prefix [2]\n");
+    printf("    -w, --max-words\t\tMaximum number of words to output [50]\n");
+    printf("    -d, --delimiter\t\tDelimiter between words in output [' ']\n");
+    printf("    -s, --hash-size\t\tHash tables sizes [10000]\n");
     printf("    -h, --help\t\t\tPrints this help message\n\n");
 
     exit(1);
@@ -118,13 +125,14 @@ static struct option longopts[] = {
     { "hash-size",      required_argument,              NULL,           's' },
     { "max-words",      required_argument,              NULL,           'w' },
     { "prefix-words",   required_argument,              NULL,           'p' },
+    { "delimiter",      required_argument,              NULL,           'd' },
     { "help",           no_argument,                    NULL,           'h' },
     { NULL,             0,                              NULL,           0 }
 };
 
 static void parse_opts(int argc, char **argv) {
     char ch;
-    while ((ch = getopt_long(argc, argv, "s:w:p:h", longopts, NULL)) != -1)
+    while ((ch = getopt_long(argc, argv, "s:w:p:d:h", longopts, NULL)) != -1)
     {
             switch (ch)
             {
@@ -136,6 +144,11 @@ static void parse_opts(int argc, char **argv) {
                     break;
                 case 'p':
                     nprefix = atoi(optarg);
+                    break;
+                case 'd':
+                    delim = strdup(optarg);
+                    if (!strcmp(delim, "\\n")) delim = "\n";
+                    if (!strcmp(delim, "\\t")) delim = "\t";
                     break;
                 case 'h':
                 case '?':
@@ -156,6 +169,7 @@ int main(int argc, char **argv) {
 
     build(prefix, stdin);
     generate(maxwords);
+    printf("\n");
 
     hash_free(states);
     hash_free(words);
