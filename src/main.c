@@ -14,7 +14,7 @@ static int hash_size = 10000;
 static int maxwords = 50;
 static char *delim = "";
 
-char NOWORD[] = "\n";
+static char NOWORD[] = "\n";
 hash_s *states;
 hash_s *words;
 
@@ -109,7 +109,7 @@ static void generate(int maxwords) {
 }
 
 static void usage() {
-    printf("  Usage: markov [options]\n");
+    printf("  Usage: markov [options]\n\n");
     printf("    reads from stdin and writes a markov chain text to stdout\n\n");
     printf("  Options:\n\n");
     printf("    -p, --prefix-words\t\tNumber of words in prefix [2]\n");
