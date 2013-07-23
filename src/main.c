@@ -134,28 +134,28 @@ static void parse_opts(int argc, char **argv) {
     char ch;
     while ((ch = getopt_long(argc, argv, "s:w:p:d:h", longopts, NULL)) != -1)
     {
-            switch (ch)
-            {
-                case 's':
-                    hash_size = atoi(optarg);
-                    break;
-                case 'w':
-                    maxwords = atoi(optarg);
-                    break;
-                case 'p':
-                    nprefix = atoi(optarg);
-                    break;
-                case 'd':
-                    delim = strdup(optarg);
-                    if (!strcmp(delim, "\\n")) delim = "\n";
-                    if (!strcmp(delim, "\\t")) delim = "\t";
-                    break;
-                case 'h':
-                case '?':
-                default:
-                    usage();
-                    break;
-            }
+        switch (ch)
+        {
+            case 's':
+                hash_size = atoi(optarg);
+                break;
+            case 'w':
+                maxwords = atoi(optarg);
+                break;
+            case 'p':
+                nprefix = atoi(optarg);
+                break;
+            case 'd':
+                delim = strdup(optarg);
+                if (!strcmp(delim, "\\n")) delim = "\n";
+                if (!strcmp(delim, "\\t")) delim = "\t";
+                break;
+            case 'h':
+            case '?':
+            default:
+                usage();
+                break;
+        }
     }
 }
 
