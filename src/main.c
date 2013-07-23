@@ -9,10 +9,7 @@
 #include "list.h"
 
 // opts
-enum {
-    NPREFIX = 2
-};
-
+static int nprefix = 2;
 static int hash_size = 10000;
 static int maxwords = 50;
 
@@ -21,7 +18,7 @@ hash_s *states;
 hash_s *words;
 
 typedef struct state_s {
-    char *prefix[NPREFIX];
+    char **prefix;
     list_s *suffix_l;
 } state_s;
 
@@ -29,7 +26,7 @@ static size_t prefix_hash(void *data) {
     char **prefix = (char **)data;
     size_t h = 0;
 
-    for (int i = 0; i < NPREFIX; i++) {
+    for (int i = 0; i < nprefix; i++) {
         char *str = prefix[i];
         for (; *str; str++) 
             h = 101 * h + *str;
@@ -42,13 +39,13 @@ static bool prefix_cmp(void *p1, void *p2) {
     char **pre1 = (char **)p1;
     char **pre2 = (char **)p2;
 
-    for (int i = 0; i < NPREFIX; i++)
+    for (int i = 0; i < nprefix; i++)
         if (strcmp(pre1[i], pre2[i])) return false;
 
     return true;
 }
 
-static void build(char *prefix[NPREFIX], FILE *f) {
+static void build(char *prefix[nprefix], FILE *f) {
     char buf[100] = {};
     char fmt[10];
 
@@ -63,37 +60,45 @@ static void build(char *prefix[NPREFIX], FILE *f) {
         state_s *st = hash_get(states, prefix);
         if (!st) {
             st = malloc(sizeof(state_s));
-            memcpy(st->prefix, prefix, sizeof(prefix[0])*NPREFIX);
+            st->prefix = malloc(sizeof(prefix[0])*nprefix);
+            memcpy(st->prefix, prefix, sizeof(prefix[0])*nprefix);
             st->suffix_l = list_new();
             hash_put(states, st->prefix, st);
         }
         list_add(st->suffix_l, word);
         // move words in prefix to the right
-        memmove(prefix, prefix+1, (NPREFIX-1)*sizeof(prefix[0]));
-        prefix[1] = word;
+        memmove(prefix, prefix+1, (nprefix-1)*sizeof(prefix[0]));
+        prefix[nprefix-1] = word;
     }
 }
 
 static void generate(int maxwords) {
-    char *prefix[NPREFIX] = {};
-    for (int i = 0; i < NPREFIX; i++) prefix[i] = NOWORD;
+    char *prefix[nprefix];
+    for (int i = 0; i < nprefix; i++) prefix[i] = NOWORD;
 
     for (int i = 0; i < maxwords; i++) {
         int nmatch = 0;
         char *word;
         state_s *st = hash_get(states, prefix);
 
+        // DEBUG:
+        //printf("checking prefix: ");
+        //for (int i = 0; i < nprefix; i++) printf("%s,", prefix[i]);
+        //printf("\n");
+
         if (!st) break;
         // select the suffix randomly
         for (list_node_s *n = st->suffix_l->head->next; n; n = n->next) {
+            // DEBUG
+            //printf("checking word: %s\n", n->data);
             srandom(time(NULL));
             if (random() % ++nmatch == 0) word = n->data;
         }
 
         printf("%s\n", word);
         // move words in prefix to the right
-        memmove(prefix, prefix+1, (NPREFIX-1)*sizeof(prefix[0]));
-        prefix[1] = word;
+        memmove(prefix, prefix+1, (nprefix-1)*sizeof(prefix[0]));
+        prefix[nprefix-1] = word;
     }
 }
 
@@ -130,7 +135,7 @@ static void parse_opts(int argc, char **argv) {
                     maxwords = atoi(optarg);
                     break;
                 case 'p':
-                    //NPREFIX = &optarg;
+                    nprefix = atoi(optarg);
                     break;
                 case 'h':
                 case '?':
@@ -144,8 +149,8 @@ static void parse_opts(int argc, char **argv) {
 #ifndef NO_MAIN
 int main(int argc, char **argv) {
     parse_opts(argc, argv);
-    char *prefix[NPREFIX] = {};
-    for (int i = 0; i < NPREFIX; i++) prefix[i] = NOWORD;
+    char *prefix[nprefix];
+    for (int i = 0; i < nprefix; i++) prefix[i] = NOWORD;
     states = hash_new(.size = hash_size, .hash_fn=prefix_hash, .keys_cmp=prefix_cmp);
     words = hash_new(.size = hash_size);
 

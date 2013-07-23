@@ -1,7 +1,7 @@
 P = markov
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:.c=.o)
-CFLAGS = -g -Wall -O0 -Wno-initializer-overrides
+CFLAGS = -g -Wall -O3 -Wno-initializer-overrides
 LDLIBS = 
 PREFIX=/usr/local
 CC = clang
