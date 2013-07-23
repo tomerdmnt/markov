@@ -1,7 +1,7 @@
 P = markov
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:.c=.o)
-CFLAGS = -g -Wall -O0
+CFLAGS = -g -Wall -O0 -Wno-initializer-overrides
 LDLIBS = 
 PREFIX=/usr/local
 CC = clang
@@ -10,7 +10,7 @@ $(P): $(OBJ)
 	$(CC) $(CFLAGS) $(LDLIBS) $(OBJ) -o markov
 
 test:
-	$(CC) -DNO_MAIN $(CFLAGS) $(LDLIBS) $(SRC) test.c -o test
+	$(CC) -DNO_MAIN $(CFLAGS) -Wno-unused-function $(LDLIBS) $(SRC) test.c -o test
 	time ./test | column -t -s '|'
 
 install: $(P)

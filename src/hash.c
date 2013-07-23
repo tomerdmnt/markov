@@ -1,10 +1,20 @@
 
 #include "hash.h"
 
-hash_s *hash_new(uint32_t size) {
+size_t char_hash(void *data) {
+    char *str = (char *)data;
+    size_t h = 0;
+    for (; *str; str++)
+        h = 101 * h + *str;
+    return h;
+}
+
+hash_s *hash_new_(hash_s *in) {
     hash_s *out = malloc(sizeof(hash_s));
-    hash_bucket_s *buckets = calloc(size, sizeof(hash_bucket_s));
-    *out = (hash_s){.buckets = buckets, .size = size};
+    *out = *in;
+    hash_bucket_s *buckets = calloc(out->size, sizeof(hash_bucket_s));
+    out->buckets = buckets;
+    if (!out->hash_fn) out->hash_fn = char_hash;
     return out;
 }
 
@@ -30,20 +40,20 @@ void hash_free(hash_s *in) {
     free(in);
 }
 
-void hash_put(hash_s *in, char *key, void *data) {
-    uint32_t h = hash(key) % in->size;
+void hash_put(hash_s *in, void *key, void *data) {
+    size_t h = in->hash_fn(key) % in->size;
     hash_bucket_s *bucket = &in->buckets[h];
     // create the items list if necessary
     if (!bucket->items) 
         bucket->items = list_new();
 
     // create the keyval and put it in the bucket
-    keyval_s *kv = keyval_new(key, data);
+    keyval_s *kv = keyval_new(key, data, .cmp=in->keys_cmp);
     list_add(bucket->items, kv);
 }
 
-void *hash_get(hash_s *in, char *key) {
-    uint32_t h = hash(key) % in->size;
+void *hash_get(hash_s *in, void *key) {
+    size_t h = in->hash_fn(key) % in->size;
     hash_bucket_s *bucket = &in->buckets[h];
     if (!bucket->items) 
         return NULL;

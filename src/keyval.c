@@ -1,9 +1,17 @@
 
 #include "keyval.h"
 
-keyval_s *keyval_new(char *key, void *val) {
+static bool default_cmp(void *k1, void *k2) {
+    char *s1 = k1;
+    char *s2 = k2;
+
+    return !strcmp(s1, s2);
+}
+
+keyval_s *keyval_new_(keyval_s *in) {
     keyval_s *out = malloc(sizeof(keyval_s));
-    *out = (keyval_s){ .key = key, .val = val};
+    *out = *in;
+    if (!out->cmp) out->cmp = default_cmp;
     return out;
 }
 
@@ -11,6 +19,6 @@ void keyval_free(keyval_s *in) {
     free(in);
 }
 
-bool keyval_matches(keyval_s *in, char *key) {
-    return !strcmp(in->key, key);
+bool keyval_matches(keyval_s *in, void *key) {
+    return in->cmp(in->key, key);
 }
