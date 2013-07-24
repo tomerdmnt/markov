@@ -93,18 +93,24 @@ static void generate(int maxwords) {
         //printf("\n");
 
         if (!st) break;
+        // DEBUG
+        //printf("checking words:\n");
         // select the suffix randomly
         for (list_node_s *n = st->suffix_l->head->next; n; n = n->next) {
             // DEBUG
-            //printf("checking word: %s\n", n->data);
+            //printf("%s,", n->data);
             srandom(time(NULL));
             if (random() % ++nmatch == 0) word = n->data;
         }
+        // DEBUG
+        //printf("\n");
 
         printf(fmt, word);
         // move words in prefix to the right
         memmove(prefix, prefix+1, (nprefix-1)*sizeof(prefix[0]));
         prefix[nprefix-1] = word;
+        // DEBUG
+        //printf("\n\n");
     }
 }
 
