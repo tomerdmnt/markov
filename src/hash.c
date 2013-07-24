@@ -49,7 +49,7 @@ void hash_put(hash_s *in, void *key, void *data) {
 
     // create the keyval and put it in the bucket
     keyval_s *kv = keyval_new(key, data, .cmp=in->keys_cmp);
-    list_add(bucket->items, kv);
+    list_push(bucket->items, kv);
 }
 
 void *hash_get(hash_s *in, void *key) {

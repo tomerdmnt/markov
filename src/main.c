@@ -66,7 +66,8 @@ static void build(char *prefix[nprefix], FILE *f) {
             st->suffix_l = list_new();
             hash_put(states, st->prefix, st);
         }
-        list_add(st->suffix_l, word);
+
+        list_push(st->suffix_l, word);
         // move words in prefix to the left 
         memmove(prefix, prefix+1, (nprefix-1)*sizeof(prefix[0]));
         prefix[nprefix-1] = word;
@@ -83,8 +84,6 @@ static void generate(int maxwords) {
     strcat(fmt, delim);
 
     for (int i = 0; i < maxwords; i++) {
-        int nmatch = 0;
-        char *word;
         state_s *st = hash_get(states, prefix);
 
         // DEBUG:
@@ -96,13 +95,11 @@ static void generate(int maxwords) {
         // DEBUG
         //printf("checking words:\n");
         // select the suffix randomly
-        for (list_node_s *n = st->suffix_l->head->next; n; n = n->next) {
-            // DEBUG
-            //printf("%s,", n->data);
-            srandom(time(NULL));
-            if (random() % ++nmatch == 0) word = n->data;
-        }
+        srandom(time(NULL));
+        size_t index = random() % st->suffix_l->len;
+        char *word = list_get(st->suffix_l, index);
         // DEBUG
+        //printf("random index: %zd of %zd", index, st->suffix_l->len);
         //printf("\n");
 
         printf(fmt, word);

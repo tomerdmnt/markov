@@ -11,10 +11,12 @@ typedef struct list_node_s {
 
 typedef struct list_s {
     list_node_s *head;
+    size_t len;
 } list_s;
 
 list_s *list_new();
 void list_free(list_s *);
-void list_add(list_s *, void *);
+void list_push(list_s *, void *);
+void *list_get(list_s *, size_t);
 
 #endif

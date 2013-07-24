@@ -19,10 +19,12 @@ void test_hash_func() {
 
 void test_list() {
     list_s *l = list_new();
-    list_add(l, "foo");
-    list_add(l, "bar");
+    list_push(l, "foo");
+    list_push(l, "bar");
     assert(!strcmp((char *)l->head->next->data, "foo"));
     assert(!strcmp((char *)l->head->next->next->data, "bar"));
+    assert(!strcmp((char *)list_get(l, 0), "foo"));
+    assert(!strcmp((char *)list_get(l, 1), "bar"));
     list_free(l);
 }
 

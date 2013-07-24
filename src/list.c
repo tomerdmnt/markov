@@ -27,10 +27,19 @@ void list_free(list_s *in) {
     free(in);
 }
 
-void list_add(list_s *in, void *data) {
+void list_push(list_s *in, void *data) {
     list_node_s *n;
     list_node_s *new = list_node_new(data);
 
-    for(n = in->head; n->next; n = n->next);
+    for (n = in->head; n->next; n = n->next);
     n->next = new;
+    in->len++;
 }
+
+void *list_get(list_s *in, size_t i) {
+    for (list_node_s *n = in->head->next; n; n = n->next, i--)
+        if (i == 0) return n->data;
+
+    return NULL;
+}
+
