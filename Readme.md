@@ -1,5 +1,10 @@
 Markov chain text generator. Reads from stdin and writes to stdout
 
+```bash
+  $ curl http://www.gutenberg.org/cache/epub/2701/pg2701.txt \
+  	| markov --max-words=500
+```
+
 ## Install
 
 ```bash
