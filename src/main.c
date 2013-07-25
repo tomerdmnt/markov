@@ -67,7 +67,7 @@ static void build(char *prefix[nprefix], FILE *f) {
             hash_put(states, st->prefix, st);
         }
         list_add(st->suffix_l, word);
-        // move words in prefix to the right
+        // move words in prefix to the left 
         memmove(prefix, prefix+1, (nprefix-1)*sizeof(prefix[0]));
         prefix[nprefix-1] = word;
     }
@@ -106,7 +106,7 @@ static void generate(int maxwords) {
         //printf("\n");
 
         printf(fmt, word);
-        // move words in prefix to the right
+        // move words in prefix to the left
         memmove(prefix, prefix+1, (nprefix-1)*sizeof(prefix[0]));
         prefix[nprefix-1] = word;
         // DEBUG
