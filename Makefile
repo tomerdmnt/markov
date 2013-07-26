@@ -25,4 +25,4 @@ uninstall:
 clean:
 	rm -f $(P) $(OBJ)
 
-.PHONY: clean install uninstall test
+.PHONY: clean install uninstall test tags
