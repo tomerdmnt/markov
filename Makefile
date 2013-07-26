@@ -13,6 +13,9 @@ test:
 	$(CC) -DNO_MAIN $(CFLAGS) -Wno-unused-function $(LDLIBS) $(SRC) test.c -o test
 	time ./test | column -t -s '|'
 
+tags:
+	ctags -R *
+
 install: $(P)
 	install $(P) $(PREFIX)/bin
 
